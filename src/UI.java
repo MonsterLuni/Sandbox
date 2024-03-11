@@ -20,6 +20,7 @@ public class UI extends JFrame {
     public int tickrate = 5;
     int i = 0;
     public HashMap<Point, Boolean> field = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
+    public HashMap<Point,Boolean> fieldtemporary = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
     public BufferedImage image = new BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB);
     public Graphics g = image.getGraphics();
     public UI(){
@@ -99,7 +100,7 @@ public class UI extends JFrame {
         }
     }
     private void updateField(){
-        HashMap<Point,Boolean> fieldtemporary = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
+
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
                 fieldtemporary.put(new Point(i,l),false);
@@ -107,13 +108,27 @@ public class UI extends JFrame {
         }
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
-                if(l + 1 < fieldHeight/pixelSize && i + 1 <= fieldWidth/pixelSize){
+                if(l + 1 < fieldHeight/pixelSize && i + 1 < fieldWidth/pixelSize){
                     boolean bottom = field.get(new Point(i,l + 1));
                     if(!bottom && field.get(new Point(i,l))){
                         fieldtemporary.replace(new Point(i,l + 1),true);
                     }
                     if(bottom && field.get(new Point(i,l))){
-                        fieldtemporary.replace(new Point(i,l),true);
+                        if(i - 1 > 0){
+                            boolean bottomLeft = field.get(new Point(i - 1,l + 1));
+                            if(!bottomLeft){
+                                fieldtemporary.replace(new Point(i - 1,l),true);
+                            } else{
+                                fieldtemporary.replace(new Point(i,l),true);
+                            }
+                        }else if (i + 1 < fieldWidth/pixelSize){
+                            boolean bottomRight = field.get(new Point(i + 1,l + 1));
+                            if (!bottomRight){
+                                fieldtemporary.replace(new Point(i + 1,l),true);
+                            }else{
+                                fieldtemporary.replace(new Point(i,l),true);
+                            }
+                        }
                     }
                 } else if (l + 1 == fieldHeight/pixelSize) {
                     if(field.get(new Point(i,l))){
@@ -123,6 +138,9 @@ public class UI extends JFrame {
             }
         }
         field = fieldtemporary;
+    }
+    private void changeSandToTrue(int x, int y){
+        fieldtemporary.replace(new Point());
     }
     public void createPieceOfSand(int x, int y){
         field.replace(new Point(x,y),field.get(new Point(x,y)),true);
