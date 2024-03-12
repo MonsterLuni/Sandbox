@@ -17,12 +17,12 @@ public class UI extends JFrame {
     public int fieldWidth = 400;
     public int fieldHeight = 400;
     public int pixelSize = 5;
-    public int tickrate = 1;
+    public int tickRate = 1;
     public int drawSizeX = 5;
     public int drawSizeY = 5;
     int i = 0;
     public HashMap<Point, Boolean> field = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
-    public HashMap<Point,Boolean> fieldtemporary;
+    public HashMap<Point,Boolean> fieldTemporary;
     public BufferedImage image = new BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB);
     public Graphics g = image.getGraphics();
     public UI(){
@@ -74,7 +74,7 @@ public class UI extends JFrame {
         getMouseBlockHover(mml.mousePoint);
         drawFieldCircumference();
         drawToImage();
-        if(i == tickrate){
+        if(i == tickRate){
             updateField();
             i = 0;
         }
@@ -82,14 +82,14 @@ public class UI extends JFrame {
     }
     private void drawFieldCircumference(){
         g.setColor(Color.white);
-        g.drawRect(findStartingXforFieldCenter(),0,fieldWidth,fieldHeight);
+        g.drawRect(findStartingXFieldCenter(),0,fieldWidth,fieldHeight);
     }
     private void drawPieceOfSand(){
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
                 if(field.get(new Point(i, l))){
                     g.setColor(Color.white);
-                    g.fillRect(findStartingXforFieldCenter() + (i*pixelSize),l*pixelSize,pixelSize,pixelSize);
+                    g.fillRect(findStartingXFieldCenter() + (i*pixelSize),l*pixelSize,pixelSize,pixelSize);
                 }
             }
         }
@@ -102,10 +102,10 @@ public class UI extends JFrame {
         }
     }
     private void updateField(){
-        fieldtemporary = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
+        fieldTemporary = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
-                fieldtemporary.put(new Point(i,l),false);
+                fieldTemporary.put(new Point(i,l),false);
             }
         }
         for (int i = 0; i < fieldWidth/pixelSize; i++){
@@ -114,11 +114,11 @@ public class UI extends JFrame {
                     try{
                         if(field.get(new Point(i,l + 1))){
                             try{
-                                boolean bottom = field.get(new Point(i,l + 1));
-                                boolean bottomleft = field.get(new Point(i - 1,l + 1));
-                                boolean bottomright = field.get(new Point(i + 1,l + 1));
+                                field.get(new Point(i,l + 1));
+                                field.get(new Point(i - 1,l + 1));
+                                field.get(new Point(i + 1,l + 1));
                                 if(Math.random() > 0.5){
-                                    // links
+                                    // left
                                     if(!field.get(new Point(i - 1,l)) && !field.get(new Point(i - 1,l + 1))){
                                         setSandToTrue(i - 1,l);
                                     }
@@ -127,7 +127,7 @@ public class UI extends JFrame {
                                     }
                                 }
                                 else{
-                                    // rechts
+                                    // right
                                     if(!field.get(new Point(i + 1,l)) && !field.get(new Point(i + 1,l + 1))){
                                         setSandToTrue(i + 1,l);
                                     }
@@ -136,7 +136,7 @@ public class UI extends JFrame {
                                     }
                                 }
                             } catch (NullPointerException e){
-                                // Links
+                                // left
                                 try {
                                     if(!field.get(new Point(i - 1,l)) && !field.get(new Point(i - 1,l + 1))){
                                         setSandToTrue(i - 1,l);
@@ -147,7 +147,7 @@ public class UI extends JFrame {
                                 } catch (NullPointerException f){
                                     setSandToTrue(i,l);
                                 }
-                                // Rechts
+                                // right
                                 try {
                                     if(!field.get(new Point(i + 1,l)) && !field.get(new Point(i + 1,l + 1))){
                                         setSandToTrue(i + 1,l);
@@ -168,41 +168,12 @@ public class UI extends JFrame {
                     }
 
                 }
-                /*
-                if(l + 1 < fieldHeight/pixelSize && i + 1 < fieldWidth/pixelSize){
-                    boolean bottom = field.get(new Point(i,l + 1));
-                    if(!bottom && field.get(new Point(i,l))){
-                        fieldtemporary.replace(new Point(i,l + 1),true);
-                    }
-                    if(bottom && field.get(new Point(i,l))){
-                        if(i - 1 > 0){
-                            boolean bottomLeft = field.get(new Point(i - 1,l + 1));
-                            if(!bottomLeft){
-                                fieldtemporary.replace(new Point(i - 1,l),true);
-                            } else{
-                                fieldtemporary.replace(new Point(i,l),true);
-                            }
-                        }else if (i + 1 < fieldWidth/pixelSize){
-                            boolean bottomRight = field.get(new Point(i + 1,l + 1));
-                            if (!bottomRight){
-                                fieldtemporary.replace(new Point(i + 1,l),true);
-                            }else{
-                                fieldtemporary.replace(new Point(i,l),true);
-                            }
-                        }
-                    }
-                } else if (l + 1 == fieldHeight/pixelSize) {
-                    if(field.get(new Point(i,l))){
-                        fieldtemporary.replace(new Point(i,l),true);
-                    }
-                }
-                */
             }
         }
-        field = fieldtemporary;
+        field = fieldTemporary;
     }
     public void setSandToTrue(int x,int y){
-        fieldtemporary.replace(new Point(x,y),fieldtemporary.get(new Point(x,y)),true);
+        fieldTemporary.replace(new Point(x,y), fieldTemporary.get(new Point(x,y)),true);
     }
     public void createPieceOfSand(int x, int y){
         field.replace(new Point(x,y),field.get(new Point(x,y)),true);
@@ -211,12 +182,12 @@ public class UI extends JFrame {
         field.replace(new Point(x,y),field.get(new Point(x,y)),false);
     }
     public void getMouseBlockHover(Point coordinates){
-        if(coordinates.x >= findStartingXforFieldCenter() && coordinates.x < fieldWidth + findStartingXforFieldCenter() && coordinates.y >= 0 && coordinates.y < fieldHeight){
+        if(coordinates.x >= findStartingXFieldCenter() && coordinates.x < fieldWidth + findStartingXFieldCenter() && coordinates.y >= 0 && coordinates.y < fieldHeight){
             g.setColor(Color.blue);
-            g.drawRect(((coordinates.x - findStartingXforFieldCenter())/pixelSize)*pixelSize + findStartingXforFieldCenter(),(coordinates.y/pixelSize)*pixelSize, pixelSize, pixelSize);
+            g.drawRect(((coordinates.x - findStartingXFieldCenter())/pixelSize)*pixelSize + findStartingXFieldCenter(),(coordinates.y/pixelSize)*pixelSize, pixelSize, pixelSize);
         }
     }
-    public int findStartingXforFieldCenter(){
+    public int findStartingXFieldCenter(){
         return (screenWidth - fieldWidth)/2;
     }
     private void drawToImage(){
