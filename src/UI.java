@@ -14,13 +14,15 @@ public class UI extends JFrame {
     public MouseListener ml;
     public int screenWidth = 500;
     public int screenHeight = 500;
-    public int fieldWidth = 300;
-    public int fieldHeight = 300;
-    public int pixelSize = 10;
-    public int tickrate = 5;
+    public int fieldWidth = 400;
+    public int fieldHeight = 400;
+    public int pixelSize = 5;
+    public int tickrate = 1;
+    public int drawSizeX = 5;
+    public int drawSizeY = 5;
     int i = 0;
     public HashMap<Point, Boolean> field = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
-    public HashMap<Point,Boolean> fieldtemporary = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
+    public HashMap<Point,Boolean> fieldtemporary;
     public BufferedImage image = new BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB);
     public Graphics g = image.getGraphics();
     public UI(){
@@ -91,7 +93,6 @@ public class UI extends JFrame {
             }
         }
     }
-
     private void makeField(){
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
@@ -100,7 +101,7 @@ public class UI extends JFrame {
         }
     }
     private void updateField(){
-
+        fieldtemporary = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
                 fieldtemporary.put(new Point(i,l),false);
@@ -108,6 +109,65 @@ public class UI extends JFrame {
         }
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
+                if(field.get(new Point(i,l))){
+                    try{
+                        if(field.get(new Point(i,l + 1))){
+                            try{
+                                boolean bottom = field.get(new Point(i,l + 1));
+                                boolean bottomleft = field.get(new Point(i - 1,l + 1));
+                                boolean bottomright = field.get(new Point(i + 1,l + 1));
+                                if(Math.random() > 0.5){
+                                    // links
+                                    if(!field.get(new Point(i - 1,l)) && !field.get(new Point(i - 1,l + 1))){
+                                        setSandToTrue(i - 1,l);
+                                    }
+                                    else{
+                                        setSandToTrue(i,l);
+                                    }
+                                }
+                                else{
+                                    // rechts
+                                    if(!field.get(new Point(i + 1,l)) && !field.get(new Point(i + 1,l + 1))){
+                                        setSandToTrue(i + 1,l);
+                                    }
+                                    else{
+                                        setSandToTrue(i,l);
+                                    }
+                                }
+                            } catch (NullPointerException e){
+                                // Links
+                                try {
+                                    if(!field.get(new Point(i - 1,l)) && !field.get(new Point(i - 1,l + 1))){
+                                        setSandToTrue(i - 1,l);
+                                    }
+                                    else{
+                                        setSandToTrue(i,l);
+                                    }
+                                } catch (NullPointerException f){
+                                    setSandToTrue(i,l);
+                                }
+                                // Rechts
+                                try {
+                                    if(!field.get(new Point(i + 1,l)) && !field.get(new Point(i + 1,l + 1))){
+                                        setSandToTrue(i + 1,l);
+                                    }
+                                    else{
+                                        setSandToTrue(i,l);
+                                    }
+                                } catch (NullPointerException f){
+                                    setSandToTrue(i,l);
+                                }
+                            }
+                        }
+                        else{
+                            setSandToTrue(i,l + 1);
+                        }
+                    } catch (NullPointerException e){
+                        setSandToTrue(i,l);
+                    }
+
+                }
+                /*
                 if(l + 1 < fieldHeight/pixelSize && i + 1 < fieldWidth/pixelSize){
                     boolean bottom = field.get(new Point(i,l + 1));
                     if(!bottom && field.get(new Point(i,l))){
@@ -135,20 +195,23 @@ public class UI extends JFrame {
                         fieldtemporary.replace(new Point(i,l),true);
                     }
                 }
+                */
             }
         }
         field = fieldtemporary;
     }
-    private void changeSandToTrue(int x, int y){
-        fieldtemporary.replace(new Point());
+    public void setSandToTrue(int x,int y){
+        fieldtemporary.replace(new Point(x,y),fieldtemporary.get(new Point(x,y)),true);
     }
     public void createPieceOfSand(int x, int y){
         field.replace(new Point(x,y),field.get(new Point(x,y)),true);
     }
+    public void destroyPieceOfSand(int x, int y){
+        field.replace(new Point(x,y),field.get(new Point(x,y)),false);
+    }
     public int findStartingXforFieldCenter(){
         return (screenWidth - fieldWidth)/2;
     }
-
     private void drawToImage(){
         super.getGraphics().drawImage(image,0,0,null);
     }
