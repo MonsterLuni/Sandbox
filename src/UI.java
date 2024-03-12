@@ -2,6 +2,8 @@ import element.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -19,18 +21,19 @@ public class UI extends JFrame {
     public MouseListener ml;
     public int screenWidth = 500;
     public int screenHeight = 500;
-    public int fieldWidth = 300;
-    public int fieldHeight = 300;
+    public int fieldWidth = 600;
+    public int fieldHeight = 600;
     public int pixelSize = 5;
-    public int tickRate = 5;
+    public int tickRate = 1;
     // looks better if it's uneven
     public int drawSizeX = 1;
     public int drawSizeY = 1;
+    Dimension screenSize;
     int i = 0;
     public HashMap<Point, Element> field = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
     public HashMap<Point,Element> fieldTemporary;
-    public BufferedImage image = new BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB);
-    public Graphics g = image.getGraphics();
+    public BufferedImage image;
+    public Graphics g;
     public UI(){
         fillElements();
         selectedElement = new ELEM_SAND();
@@ -40,8 +43,6 @@ public class UI extends JFrame {
         setSize(screenWidth, screenHeight);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
-        setUndecorated(true);
         setIconImage(new ImageIcon("assets/logo.png").getImage());
         setVisible(true);
         addKeyListener(kl);
@@ -49,7 +50,18 @@ public class UI extends JFrame {
         addMouseListener(ml);
         setFocusTraversalKeysEnabled(false);
         lastTime = System.currentTimeMillis();
+        screenSize = getSize();
+        image = new BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB);
+        g = image.getGraphics();
         makeField();
+        addComponentListener(new ComponentAdapter()
+        {
+            public void componentResized(ComponentEvent evt) {
+                screenSize = getSize();
+                image = new BufferedImage(screenWidth,screenHeight,BufferedImage.TYPE_INT_RGB);
+                g = image.getGraphics();
+            }
+        });
         fpsLimiter();
     }
     public void fpsLimiter() {
@@ -77,6 +89,8 @@ public class UI extends JFrame {
         g.fillRect(0,0,screenWidth,screenHeight);
     }
     public void update(){
+        screenWidth = screenSize.width;
+        screenHeight = screenSize.height;
         clearWindow(Color.black);
         drawSelectableElements();
         drawPieceOfSand();
