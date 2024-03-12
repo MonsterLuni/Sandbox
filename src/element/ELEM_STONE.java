@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class ELEM_STONE extends Element {
     public ELEM_STONE(){
-        this.solid = true;
+        this.NotAir = true;
         this.color = Color.gray;
         this.name = "Stone";
     }

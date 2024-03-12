@@ -1,7 +1,4 @@
-import element.ELEM_AIR;
-import element.ELEM_SAND;
-import element.ELEM_STONE;
-import element.Element;
+import element.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +9,7 @@ import java.util.Objects;
 
 public class UI extends JFrame {
     public Element selectedElement;
-    public Element[] elements = new Element[3];
+    public Element[] elements = new Element[4];
     public boolean running = true;
     public double fps;
     public long lastTime;
@@ -25,9 +22,10 @@ public class UI extends JFrame {
     public int fieldWidth = 300;
     public int fieldHeight = 300;
     public int pixelSize = 5;
-    public int tickRate = 1;
-    public int drawSizeX = 10;
-    public int drawSizeY = 10;
+    public int tickRate = 5;
+    // looks better if it's uneven
+    public int drawSizeX = 1;
+    public int drawSizeY = 1;
     int i = 0;
     public HashMap<Point, Element> field = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
     public HashMap<Point,Element> fieldTemporary;
@@ -95,6 +93,7 @@ public class UI extends JFrame {
         elements[0] = new ELEM_AIR();
         elements[1] = new ELEM_SAND();
         elements[2] = new ELEM_STONE();
+        elements[3] = new ELEM_WATER();
     }
     private void drawFieldCircumference(){
         g.setColor(Color.white);
@@ -140,51 +139,26 @@ public class UI extends JFrame {
         }
         for (int i = 0; i < fieldWidth/pixelSize; i++){
             for (int l = 0; l < fieldHeight/pixelSize; l++){
-                if(field.get(new Point(i,l)).solid){
+                if(field.get(new Point(i,l)).NotAir){
                     try{
-                        if(field.get(new Point(i,l + 1)).solid){
+                        if (field.get(new Point(i,l)).solid && !field.get(new Point(i,l + 1)).solid){
+                            setSandToTrue(i,l,field.get(new Point(i,l + 1)));
+                            setSandToTrue(i,l + 1,field.get(new Point(i,l)));
+                        }
+                        else if(field.get(new Point(i,l + 1)).NotAir){
                             try{
-                                field.get(new Point(i,l + 1));
-                                field.get(new Point(i - 1,l + 1));
-                                field.get(new Point(i + 1,l + 1));
-                                if(Math.random() > 0.5){
-                                    // left
-                                    if(!field.get(new Point(i - 1,l)).solid && !field.get(new Point(i - 1,l + 1)).solid){
-                                        setSandToTrue(i - 1,l,field.get(new Point(i,l)));
-                                    }
-                                    else{
-                                        setSandToTrue(i,l,field.get(new Point(i,l)));
-                                    }
-                                }
-                                else{
-                                    // right
-                                    if(!field.get(new Point(i + 1,l)).solid && !field.get(new Point(i + 1,l + 1)).solid){
-                                        setSandToTrue(i + 1,l,field.get(new Point(i,l)));
-                                    }
-                                    else{
-                                        setSandToTrue(i,l,field.get(new Point(i,l)));
-                                    }
-                                }
+                                // Both sides gets Checked
+                                checkLeftRight(i,l);
                             } catch (NullPointerException e){
                                 // left
                                 try {
-                                    if(!field.get(new Point(i - 1,l)).solid && !field.get(new Point(i - 1,l + 1)).solid){
-                                        setSandToTrue(i - 1,l,field.get(new Point(i,l)));
-                                    }
-                                    else{
-                                        setSandToTrue(i,l,field.get(new Point(i,l)));
-                                    }
+                                    checkLeft(i,l);
                                 } catch (NullPointerException f){
                                     setSandToTrue(i,l,field.get(new Point(i,l)));
                                 }
                                 // right
                                 try {
-                                    if(!field.get(new Point(i + 1,l)).solid && !field.get(new Point(i + 1,l + 1)).solid){
-                                        setSandToTrue(i + 1,l,field.get(new Point(i,l)));
-                                    }
-                                    else{
-                                        setSandToTrue(i,l,field.get(new Point(i,l)));
-                                    }
+                                    checkRight(i,l);
                                 } catch (NullPointerException f){
                                     setSandToTrue(i,l,field.get(new Point(i,l)));
                                 }
@@ -201,6 +175,32 @@ public class UI extends JFrame {
             }
         }
         field = fieldTemporary;
+    }
+    public void checkLeftRight(int i, int l){
+        field.get(new Point(i,l + 1));
+        field.get(new Point(i - 1,l + 1));
+        field.get(new Point(i + 1,l + 1));
+        if(Math.random() > 0.5){
+            checkLeft(i,l);
+        } else{
+            checkRight(i,l);
+        }
+    }
+    public void checkLeft(int i,int l){
+        if(!field.get(new Point(i - 1,l)).NotAir && !field.get(new Point(i - 1,l + 1)).NotAir){
+            setSandToTrue(i - 1,l,field.get(new Point(i,l)));
+        }
+        else{
+            setSandToTrue(i,l,field.get(new Point(i,l)));
+        }
+    }
+    public void checkRight(int i,int l){
+        if(!field.get(new Point(i + 1,l)).NotAir && !field.get(new Point(i + 1,l + 1)).NotAir){
+            setSandToTrue(i + 1,l,field.get(new Point(i,l)));
+        }
+        else{
+            setSandToTrue(i,l,field.get(new Point(i,l)));
+        }
     }
     public void setSandToTrue(int x,int y, Element change){
         fieldTemporary.replace(new Point(x,y), fieldTemporary.get(new Point(x,y)),change);
