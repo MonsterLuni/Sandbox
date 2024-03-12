@@ -14,12 +14,12 @@ public class UI extends JFrame {
     public MouseListener ml;
     public int screenWidth = 500;
     public int screenHeight = 500;
-    public int fieldWidth = 400;
-    public int fieldHeight = 400;
+    public int fieldWidth = 300;
+    public int fieldHeight = 300;
     public int pixelSize = 5;
     public int tickRate = 1;
-    public int drawSizeX = 5;
-    public int drawSizeY = 5;
+    public int drawSizeX = 10;
+    public int drawSizeY = 10;
     int i = 0;
     public HashMap<Point, Boolean> field = new HashMap<>((fieldWidth/pixelSize)*(fieldHeight/pixelSize));
     public HashMap<Point,Boolean> fieldTemporary;
