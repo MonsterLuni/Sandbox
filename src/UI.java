@@ -71,6 +71,7 @@ public class UI extends JFrame {
     public void update(){
         clearWindow(Color.black);
         drawPieceOfSand();
+        getMouseBlockHover(mml.mousePoint);
         drawFieldCircumference();
         drawToImage();
         if(i == tickrate){
@@ -208,6 +209,12 @@ public class UI extends JFrame {
     }
     public void destroyPieceOfSand(int x, int y){
         field.replace(new Point(x,y),field.get(new Point(x,y)),false);
+    }
+    public void getMouseBlockHover(Point coordinates){
+        if(coordinates.x >= findStartingXforFieldCenter() && coordinates.x < fieldWidth + findStartingXforFieldCenter() && coordinates.y >= 0 && coordinates.y < fieldHeight){
+            g.setColor(Color.blue);
+            g.drawRect(((coordinates.x - findStartingXforFieldCenter())/pixelSize)*pixelSize + findStartingXforFieldCenter(),(coordinates.y/pixelSize)*pixelSize, pixelSize, pixelSize);
+        }
     }
     public int findStartingXforFieldCenter(){
         return (screenWidth - fieldWidth)/2;

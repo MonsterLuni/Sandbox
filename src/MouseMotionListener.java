@@ -3,19 +3,18 @@ import java.awt.event.MouseEvent;
 
 public class MouseMotionListener implements java.awt.event.MouseMotionListener {
     UI ui;
+    public Point mousePoint = new Point(-1,-1);
     public MouseMotionListener(UI ui){
         this.ui = ui;
     }
-    public void getMouseBlockHover(Point coordinates){
-        if(coordinates.x >= ui.findStartingXforFieldCenter() && coordinates.x < ui.fieldWidth + ui.findStartingXforFieldCenter() && coordinates.y >= 0 && coordinates.y < ui.fieldHeight){
-            ui.g.drawRect(((coordinates.x - ui.findStartingXforFieldCenter())/ui.pixelSize)*ui.pixelSize + ui.findStartingXforFieldCenter(),(coordinates.y/ui.pixelSize)*ui.pixelSize, ui.pixelSize, ui.pixelSize);
-        }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        mousePoint = e.getPoint();
     }
     @Override
-    public void mouseMoved(MouseEvent e) {}
-    @Override
     public void mouseDragged(MouseEvent e) {
-        getMouseBlockHover(e.getPoint());
+        mousePoint = e.getPoint();
         if(ui.ml.leftPressed){
             Point coordinates = e.getPoint();
             if(coordinates.x >= ui.findStartingXforFieldCenter() && coordinates.x < ui.fieldWidth + ui.findStartingXforFieldCenter() && coordinates.y >= 0 && coordinates.y < ui.fieldHeight){
